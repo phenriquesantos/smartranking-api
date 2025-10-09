@@ -23,7 +23,7 @@ export class JogadoresController {
   ): Promise<Jogador[] | Jogador> {
     if (email) {
       const jogador = await this.jogadorService.obterJogadorPorEmail(email);
-      if (!jogador) throw new NotFoundException('jogador não encotrado');
+      if (jogador === null) throw new NotFoundException('jogador não encotrado');
 
       return jogador;
     }
