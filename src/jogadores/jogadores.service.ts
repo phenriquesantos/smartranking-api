@@ -1,4 +1,4 @@
-import { HttpException, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CriarJogadorDto } from './dtos/criar-jogador.dto';
 import { Jogador } from './interfaces/jogador.interface';
 import { v4 as uuidv4 } from 'uuid';
@@ -30,9 +30,17 @@ export class JogadoresService {
       await this.criarJogador(criarJogadorDto);
   }
 
-  async atualizarJogador(jogador: Jogador, jogadorDto: CriarJogadorDto): Promise<void>{
+  async atualizarJogador(jogador: Jogador, jogadorDto: CriarJogadorDto): Promise<void> {
     const { nome } = jogadorDto;
     jogador.nome = nome;
+  }
+
+  async deletarJogador(email: string): Promise<void> {
+    const jogadorEncontrado = this.jogadores.find(jogador => jogador.email === email);
+    if (!jogadorEncontrado) throw new NotFoundException('jogador não encotrado');
+
+    this.jogadores = this.jogadores
+      .filter(jogador => jogador.email !== jogadorEncontrado.email);
   }
 
   private async criarJogador(criarogadorDto): Promise<void> {
@@ -49,6 +57,5 @@ export class JogadoresService {
     }
 
     this.jogadores.push(jogador);
-    this.logger.log(JSON.stringify(this.jogadores));
   }
 }
