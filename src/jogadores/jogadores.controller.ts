@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpException, NotFoundException, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpException, NotFoundException, Param, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { CriarJogadorDto } from './dtos/criar-jogador.dto';
 import { JogadoresService } from './jogadores.service';
 import { Jogador } from './interfaces/jogador.interface';
@@ -11,6 +11,7 @@ export class JogadoresController {
   ) { }
 
   @Post()
+  @UsePipes(ValidationPipe)
   async criarAtualizarJogador(
     @Body() criarJogadorDto: CriarJogadorDto
   ) {
