@@ -8,6 +8,6 @@ export class AtualizarJogadorDto {
 
   @IsNotEmpty()
   @IsString()
-  name: string;
+  nome: string;
 
 }

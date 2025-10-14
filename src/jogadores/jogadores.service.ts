@@ -36,7 +36,7 @@ export class JogadoresService {
   async atualizarJogador(id: string, atualizarJogadorDto: AtualizarJogadorDto): Promise<void> {
     await this.obterJogadorPorId(id);
     await this.jogadorModel
-      .findOneAndUpdate({ _id: id }, { set: atualizarJogadorDto })
+      .findOneAndUpdate({ _id: id }, { $set: atualizarJogadorDto })
       .exec();
   }
 
