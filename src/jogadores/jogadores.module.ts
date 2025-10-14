@@ -9,6 +9,7 @@ import { JogadorSchema } from './interfaces/jogador.schema';
     MongooseModule.forFeature([ { name: 'Jogador', schema: JogadorSchema } ]),
   ],
   controllers: [JogadoresController],
-  providers: [JogadoresService, Logger]
+  providers: [JogadoresService, Logger],
+  exports: [JogadoresService],
 })
 export class JogadoresModule {}
