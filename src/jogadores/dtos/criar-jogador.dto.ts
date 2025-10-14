@@ -1,6 +1,6 @@
 import { IsEmail, IsNotEmpty, IsString } from "class-validator";
 
-export class JogadorDto {
+export class CriarJogadorDto {
 
   @IsString()
   @IsNotEmpty()
