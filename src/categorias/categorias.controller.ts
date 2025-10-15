@@ -3,6 +3,7 @@ import { CategoriasService } from './categorias.service';
 import { CriarCategoriaDto } from './dtos/criar-categoria.dto';
 import { Categoria } from './interfaces/categoria.interface';
 import { AtualizarCategoriaDto } from './dtos/atualizar-categoria.dto';
+import { ValidacaoParametrosPipe } from 'src/common/pipes/validacao-parametros.pipe';
 
 @Controller('api/v1/categorias')
 export class CategoriasController {
@@ -25,7 +26,7 @@ export class CategoriasController {
 
   @Get('/:id')
   async obterCategoriaPorId(
-    @Param('id') id: string,
+    @Param('id', ValidacaoParametrosPipe) id: string,
   ){
     return this.categoriasService.obterCategoriaPorId(id);
   }
@@ -34,7 +35,7 @@ export class CategoriasController {
   @UsePipes(ValidationPipe)
   async atualizarCategoria(
     @Body() atualizarCategoriaDto: AtualizarCategoriaDto,
-    @Param('id') id: string,
+    @Param('id', ValidacaoParametrosPipe) id: string,
   ): Promise<void>{
     await this.categoriasService.atualizarCategoria(id, atualizarCategoriaDto);
   }
