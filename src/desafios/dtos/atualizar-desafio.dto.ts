@@ -1,14 +1,13 @@
-import { IsDateString, IsEnum, IsNotEmpty, IsOptional } from "class-validator";
-import { AtualizarStatusDesafioEnum } from "../enums/atualizar-status-desafio.enum";
+import { IsDateString, IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class AtualizarDesafioDto {
 
-  @IsNotEmpty()
-  @IsEnum(AtualizarStatusDesafioEnum)
-  status: AtualizarStatusDesafioEnum;
+  @IsOptional()
+  @IsString()
+  status?: string;
 
   @IsDateString()
   @IsOptional()
-  dataHoraDesafio: Date;
+  dataHoraDesafio?: Date;
 
 }

@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Desafio, Partida } from './interfaces/desafio';
@@ -8,7 +8,6 @@ import { CategoriasService } from 'src/categorias/categorias.service';
 import { DesafioStatus } from './enums/desafio-status.enum';
 import { AtualizarDesafioDto } from './dtos/atualizar-desafio.dto';
 import { AdicionarPartidaDesafioDto } from './dtos/adicionar-partida-desafio.dto';
-import { AtualizarStatusDesafioEnum } from './enums/atualizar-status-desafio.enum';
 
 @Injectable()
 export class DesafiosService {
@@ -23,13 +22,16 @@ export class DesafiosService {
   async criarDesafio(criarDesafioDto: CriarDesafioDto): Promise<Desafio> {
     const { jogadores, solicitante } = criarDesafioDto;
 
-    const jogador1 = await this.jogadoresService.obterJogadorPorId(jogadores[0]._id);
-    const jogador2 = await this.jogadoresService.obterJogadorPorId(jogadores[1]._id);
+    const [jogador1, jogador2, solicitanteEncotrado] = await Promise.all([
+      await this.jogadoresService.obterJogadorPorId(jogadores[0]._id),
+      await this.jogadoresService.obterJogadorPorId(jogadores[1]._id),
+      await this.jogadoresService.obterJogadorPorId(solicitante._id),
+    ]);
+
     if (!jogador1 || !jogador2)
-      throw new BadRequestException('é necessario ter dois jogadores ' +
+      throw new BadRequestException('É necessario ter dois jogadores ' +
         'para cadastrar um desafio');
 
-    const solicitanteEncotrado = await this.jogadoresService.obterJogadorPorId(solicitante._id);
     if (!solicitanteEncotrado)
       throw new BadRequestException('Solicitante não encotrado');
 
@@ -64,7 +66,7 @@ export class DesafiosService {
   async atualizarDesafio(id: string, atualizarDesafioDto: AtualizarDesafioDto): Promise<void> {
     await this.obterDesafioPorId(id);
     const dataHoraResposta = 
-      atualizarDesafioDto.status == AtualizarStatusDesafioEnum.ACEITO ?
+      atualizarDesafioDto.status == DesafioStatus.ACEITO ?
       new Date() : null;
   
     await this.desafioModel.findOneAndUpdate({ _id: id },
@@ -93,9 +95,16 @@ export class DesafiosService {
       jogadores: desafio.jogadores,
       categoria: desafio.categoria,
     });
+
     desafio.partida = await partida.save();
     desafio.status = DesafioStatus.REALIZADO;
-    await desafio.save();
+
+    try{
+      await desafio.save();
+    }catch(error){
+      await this.partidaModel.findOneAndDelete({ _id: partida._id }).exec();
+      throw new InternalServerErrorException('Não foi possivel adicionar a partida ao desafio');
+    }
   }
 
   private async obterDesafioPorId(id: string): Promise<Desafio> {
